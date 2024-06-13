@@ -64,18 +64,60 @@ for i in range(3):
         HR = int(player_array_sort[i][1])
         print(f"Year: {Year}, Home Runs: {HR}")
 
-*Data Import: It uses np.genfromtxt() to import data from CSV files into structured NumPy arrays. The data is specified to be loaded with a specific data type using dtype.
+import pandas as pd
+import os
 
-*Array Manipulation: The code manipulates arrays using functions like np.column_stack() to combine arrays column-wise and slicing operations to select specific elements or ranges from arrays.
+# CSV files to pull desired data
+files = {
+    "HA": "Hank Aaron Stats.csv",
+    "BB": "Barry Bonds Stats.csv",
+    "TC": "Ty Cobb Stats.csv",
+    "WM": "Willie Mays Stats.csv",
+    "SM": "Stan Musial Stats.csv",
+    "AP": "Albert Pujols Stats.csv",
+    "PR": "Pete Rose Stats.csv",
+    "BR": "Babe Ruth Stats.csv",
+    "HW": "Honus Wagner Stats.csv",
+    "TW": "Ted Williams Stats.csv"
+}
 
-*Array Sorting: It sorts arrays using argsort() to get the indices that would sort the array along a specified axis and then reverses the order using slicing.
+# Base directory path
+#base_dir = r"C:\Users\zscon\Desktop\SSE_591\repo\SSE591_Week3\Week 3\Baseball Statistics"
+base_dir = r"C:\Users\zscon\Desktop\SSE_591\repo\SSE591_Week3\Week 3\Baseball Statistics"
 
-*Array Indexing and Slicing: It accesses elements and slices of arrays using square brackets [].
+# List to store all the player DataFrames
+player_dataframes = {}
+all_player_dfs = []
 
-*Iteration: It iterates over dictionary items using a for loop.
+# Load data for each player into a pandas DataFrame
+for player, file_name in files.items():
+    file_path = os.path.join(base_dir, file_name)
+    player_df = pd.read_csv(file_path)
+    # Drop rows with any missing values (empty cells)
+    player_dataframes[player] = player_df.dropna()
 
-*NumPy Functionality: Utilizes NumPy functions like np.column_stack(), argsort(), and array indexing in various parts of the code.
+# Accessing Ted Williams' information
+print('Willie Mays stats without military status:\n',player_dataframes["WM"])
+print('\nStan Musial stats without military status:\n',player_dataframes["SM"])
+print('\nTed Williams stats without military status:\n',player_dataframes["TW"]) 
 
-*Data Aggregation: It aggregates data (total home runs per year) using a dictionary.
+# Load data for each player into a pandas DataFrame
+for player, file_name in files.items():
+    file_path = os.path.join(base_dir, file_name)
+    player_df = pd.read_csv(file_path)
+    # Selecting columns "AB" to "RBI"
+    selected_df = player_df.loc[:, "AB":"RBI"]
+    # Summing the selected columns
+    sum_result = selected_df.sum()
+    # Transpose the DataFrame
+    transposed_df = sum_result.to_frame().transpose()
+    # Set the headers as the items in .loc slice
+    transposed_df.columns = selected_df.columns
+    # Replace the zero index with the player's name
+    transposed_df.rename(index={0: player}, inplace=True)
+    # Append the transposed DataFrame to the list
+    all_player_dfs.append(transposed_df)
 
-*Sorting: Sorts the dictionary by values in descending order using sorted() and a lambda function.
+# Concatenate all the player DataFrames into one DataFrame
+merged_df = merged_df.sort_values(by = "H",ascending=False)
+print(merged_df)
